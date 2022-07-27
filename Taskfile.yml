@@ -1,0 +1,56 @@
+version: "3"
+
+tasks:
+  lint:
+    desc: Lint code
+    cmds:
+      - golangci-lint run -c .golangci.yml
+    summary: Lint the project with golangci-lint
+
+  fmt:
+    desc: Run `go fmt` to format the code
+    cmds:
+      - go fmt ./...
+
+  test:
+    desc: Run the tests
+    cmds:
+      - go test -v ./...
+
+  run:
+    desc: Start the service
+    env: &local_env
+      LOCAL: LOCAL
+      WORKER_HTTP_HOST: "localhost"
+      WORKER_HTTP_PORT: "7777"
+      MANAGER_HTTP_HOST: "localhost"
+      MANAGER_HTTP_PORT: "8888"
+    cmds:
+      - go run -v cmd/server/main.go
+
+  debug:
+    desc: Start the service with delve for debugging
+    env: *local_env
+    cmds:
+      - dlv debug cmd/server/main.go
+
+  tidy:
+    desc: Run 'go mod tidy' to clean up module files.
+    cmds:
+      - go mod tidy -v
+
+  check-tidy:
+    desc: Check go.mod is tidy
+    cmds:
+      - go mod tidy -v
+      - git diff --exit-code -- go.mod go.sum
+
+  vendor:
+    desc: go mod vendor
+    cmds:
+      - go mod vendor
+
+  build:
+    desc: Build main
+    cmds:
+      - go build -v ./...
